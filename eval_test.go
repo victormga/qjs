@@ -4,8 +4,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/fastschema/qjs"
 	"github.com/stretchr/testify/assert"
+	"github.com/victormga/qjs"
 )
 
 type evalTest struct {

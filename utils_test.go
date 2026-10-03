@@ -5,8 +5,8 @@ import (
 	"testing"
 	"unsafe"
 
-	"github.com/fastschema/qjs"
 	"github.com/stretchr/testify/assert"
+	"github.com/victormga/qjs"
 )
 
 func TestIsConvertibleToJs(t *testing.T) {

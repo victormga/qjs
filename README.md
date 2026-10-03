@@ -1,17 +1,17 @@
 # QJS - JavaScript in Go with QuickJS and Wazero
 
 <p align="center">
-  <a href="https://pkg.go.dev/github.com/fastschema/qjs#section-readme" target="_blank" rel="noopener">
+  <a href="https://pkg.go.dev/github.com/victormga/qjs#section-readme" target="_blank" rel="noopener">
     <img src="https://img.shields.io/badge/go.dev-reference-blue?logo=go&logoColor=white" alt="Go.Dev reference" />
   </a>
-  <a href="https://goreportcard.com/report/github.com/fastschema/qjs" target="_blank" rel="noopener">
-    <img src="https://goreportcard.com/badge/github.com/fastschema/qjs" alt="go report card" />
+  <a href="https://goreportcard.com/report/github.com/victormga/qjs" target="_blank" rel="noopener">
+    <img src="https://goreportcard.com/badge/github.com/victormga/qjs" alt="go report card" />
   </a>
   <a href="https://codecov.io/gh/fastschema/qjs/branch/master" >
     <img src="https://codecov.io/gh/fastschema/qjs/branch/master/graph/badge.svg?token=yluqOtL5z0"/>
   </a>
-  <a href="https://github.com/fastschema/qjs/actions" target="_blank" rel="noopener">
-    <img src="https://github.com/fastschema/qjs/actions/workflows/ci.yml/badge.svg" alt="test status" />
+  <a href="https://github.com/victormga/qjs/actions" target="_blank" rel="noopener">
+    <img src="https://github.com/victormga/qjs/actions/workflows/ci.yml/badge.svg" alt="test status" />
   </a>
   <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">
     <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="MIT license" />
@@ -145,7 +145,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fastschema/qjs"
+	"github.com/victormga/qjs"
 )
 
 func must[T any](val T, err error) T {
@@ -490,7 +490,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/fastschema/qjs"
+	"github.com/victormga/qjs"
 )
 
 type Post struct {
@@ -577,7 +577,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/fastschema/qjs"
+	"github.com/victormga/qjs"
 )
 
 func main() {
@@ -634,12 +634,12 @@ func main() {
 ## Installation
 
 ```bash
-go get github.com/fastschema/qjs
+go get github.com/victormga/qjs
 ```
 
 
 ```go
-import "github.com/fastschema/qjs"
+import "github.com/victormga/qjs"
 ```
 
 **Compatible with Go 1.22.0+**
@@ -781,7 +781,7 @@ defer result.Free()
 
 ```bash
 # Clone with submodules
-git clone --recursive https://github.com/fastschema/qjs.git
+git clone --recursive https://github.com/victormga/qjs.git
 cd qjs
 
 # Install WASI SDK (Linux/macOS)
@@ -805,7 +805,7 @@ go test ./...
 
 We'd love your help making QJS better! Here's how:
 
-1. **Found a bug?** [Open an issue](https://github.com/fastschema/qjs/issues).
+1. **Found a bug?** [Open an issue](https://github.com/victormga/qjs/issues).
 2. **Want a feature?** Start a discussion.
 3. **Ready to code?** Fork, branch, test, and submit a PR.
 4. **Review PRs** - help review and test contributions.
@@ -813,9 +813,9 @@ We'd love your help making QJS better! Here's how:
 
 ## Support & Community
 
-- **Documentation**: [GoDoc](https://godoc.org/github.com/fastschema/qjs)
-- **Issues**: [GitHub Issues](https://github.com/fastschema/qjs/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/fastschema/qjs/discussions)
+- **Documentation**: [GoDoc](https://godoc.org/github.com/victormga/qjs)
+- **Issues**: [GitHub Issues](https://github.com/victormga/qjs/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/victormga/qjs/discussions)
 
 **Getting Help:**
 1. Check existing issues and documentation.
@@ -848,7 +848,7 @@ Built on the shoulders of giants:
 **Ready to run JavaScript safely in your Go apps?**
 
 ```bash
-go get github.com/fastschema/qjs
+go get github.com/victormga/qjs
 ```
 
-**Questions? Ideas? Contributions?** We're here to help → [Start a discussion](https://github.com/fastschema/qjs/discussions)
+**Questions? Ideas? Contributions?** We're here to help → [Start a discussion](https://github.com/victormga/qjs/discussions)

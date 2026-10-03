@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fastschema/qjs"
 	"github.com/stretchr/testify/assert"
+	"github.com/victormga/qjs"
 )
 
 // Basic Properties Tests

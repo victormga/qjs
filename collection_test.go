@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/fastschema/qjs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/victormga/qjs"
 )
 
 // setupRuntime creates a new runtime and context for testing

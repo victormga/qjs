@@ -8,9 +8,9 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/fastschema/qjs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/victormga/qjs"
 )
 
 func TestParseTimezone(t *testing.T) {

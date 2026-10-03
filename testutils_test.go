@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fastschema/qjs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/victormga/qjs"
 )
 
 func setupTestContext(_ *testing.T) (*qjs.Runtime, *qjs.Context) {
