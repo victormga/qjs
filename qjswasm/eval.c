@@ -214,7 +214,7 @@ JSModuleDef *QJS_ModuleLoader(JSContext *ctx, const char *module_name, void *opa
         return js_module_loader_json(ctx, module_name);
     }
 
-    JSModuleDef *mod = js_module_loader(ctx, module_name, opaque);
+    JSModuleDef *mod = js_module_loader(ctx, module_name, opaque, JS_UNDEFINED);
     return mod;
 }
 

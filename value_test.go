@@ -437,7 +437,7 @@ func TestValuePropertyOperations(t *testing.T) {
 		val := ctx.NewString("value")
 		defer val.Free()
 
-		obj.SetPropertyStr("prop", val)
+		obj.SetPropertyStr("prop", val.Clone())
 
 		prop := obj.GetPropertyStr("prop")
 		defer prop.Free()
@@ -455,7 +455,7 @@ func TestValuePropertyOperations(t *testing.T) {
 		val := ctx.NewString("value")
 		defer val.Free()
 
-		obj.SetProperty(key, val)
+		obj.SetProperty(key, val.Clone())
 
 		prop := obj.GetProperty(key)
 		defer prop.Free()
@@ -470,7 +470,7 @@ func TestValuePropertyOperations(t *testing.T) {
 		val := ctx.NewString("value")
 		defer val.Free()
 
-		arr.SetPropertyIndex(0, val)
+		arr.SetPropertyIndex(0, val.Clone())
 
 		prop := arr.GetPropertyIndex(0)
 		defer prop.Free()
@@ -485,7 +485,7 @@ func TestValuePropertyOperations(t *testing.T) {
 		val := ctx.NewString("value")
 		defer val.Free()
 
-		obj.SetPropertyStr("prop", val)
+		obj.SetPropertyStr("prop", val.Clone())
 
 		assert.True(t, obj.HasProperty("prop"))
 		assert.False(t, obj.HasProperty("nonExistent"))
@@ -506,7 +506,7 @@ func TestValuePropertyOperations(t *testing.T) {
 		val := ctx.NewString("value")
 		defer val.Free()
 
-		obj.SetPropertyStr("prop", val)
+		obj.SetPropertyStr("prop", val.Clone())
 		assert.True(t, obj.HasProperty("prop"))
 
 		deleteResult := obj.DeleteProperty("prop")

@@ -571,8 +571,8 @@ func TestMem_Strings(t *testing.T) {
 	}
 
 	t.Run("missing_null_terminator_error", func(t *testing.T) {
-		ptr := util.allocatePtr(5)
-		runtime.Mem().MustWrite(ptr, []byte{65, 66, 67, 68, 69})
+		ptr := util.allocatePtr(6)
+		runtime.Mem().MustWrite(ptr, []byte{65, 66, 67, 68, 69, 70}) // ReadString scans maxlen+1 bytes
 		_, err := runtime.Mem().ReadString(ptr, 5)
 		assert.ErrorIs(t, err, qjs.ErrNoNullTerminator)
 	})

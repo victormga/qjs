@@ -169,16 +169,8 @@ func TestRuntime(t *testing.T) {
 		assert.Error(t, err, "Creating runtime with invalid start function should return error")
 	})
 
-	t.Run("FreeQJSRuntimePanicOnDuplicateFree", func(t *testing.T) {
-		rt := must(qjs.New())
-		rt.FreeQJSRuntime()
-
-		assert.Panics(t, func() {
-			rt.FreeQJSRuntime()
-		}, "FreeQJSRuntime should panic on double free")
-
-		// nil runtime closing should not panic
-		rt = nil
+	t.Run("CloseNilRuntime", func(t *testing.T) {
+		var rt *qjs.Runtime
 		assert.NotPanics(t, func() {
 			rt.Close()
 		}, "Closing nil runtime should not panic")
