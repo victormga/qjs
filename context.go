@@ -125,7 +125,7 @@ func (c *Context) SetAsyncFunc(name string, fn AsyncFunction) {
 // ParseJSON parses given JSON string and returns an object value.
 func (c *Context) ParseJSON(v string) *Value {
 	cStr := c.NewStringHandle(v)
-	defer cStr.Free()
+	defer c.FreeHandle(cStr.Raw())
 
 	return c.Call("QJS_ParseJSON", c.Raw(), cStr.Raw())
 }
@@ -200,6 +200,7 @@ func (c *Context) NewFloat64(v float64) *Value {
 // NewString creates a new JavaScript string value.
 func (c *Context) NewString(v string) *Value {
 	str := c.NewStringHandle(v)
+	defer c.FreeHandle(str.Raw())
 
 	return c.Call("QJS_NewString", c.Raw(), str.Raw())
 }
@@ -242,7 +243,7 @@ func (c *Context) NewAtom(v string) Atom {
 
 	atomValue := c.Call("JS_NewAtom", c.Raw(), cstr.Raw())
 
-	defer cstr.Free()
+	defer c.FreeHandle(cstr.Raw())
 
 	return Atom{context: c, Value: atomValue}
 }
@@ -302,7 +303,7 @@ func (c *Context) ThrowSyntaxError(format string, args ...any) *Value {
 	cause := fmt.Sprintf(format, args...)
 
 	causePtr := c.NewStringHandle(cause)
-	defer causePtr.Free()
+	defer c.FreeHandle(causePtr.Raw())
 
 	return c.Call("QJS_ThrowSyntaxError", c.Raw(), causePtr.Raw())
 }
@@ -312,7 +313,7 @@ func (c *Context) ThrowTypeError(format string, args ...any) *Value {
 	cause := fmt.Sprintf(format, args...)
 
 	causePtr := c.NewStringHandle(cause)
-	defer causePtr.Free()
+	defer c.FreeHandle(causePtr.Raw())
 
 	return c.Call("QJS_ThrowTypeError", c.Raw(), causePtr.Raw())
 }
@@ -322,7 +323,7 @@ func (c *Context) ThrowReferenceError(format string, args ...any) *Value {
 	cause := fmt.Sprintf(format, args...)
 
 	causePtr := c.NewStringHandle(cause)
-	defer causePtr.Free()
+	defer c.FreeHandle(causePtr.Raw())
 
 	return c.Call("QJS_ThrowReferenceError", c.Raw(), causePtr.Raw())
 }
@@ -332,7 +333,7 @@ func (c *Context) ThrowRangeError(format string, args ...any) *Value {
 	cause := fmt.Sprintf(format, args...)
 
 	causePtr := c.NewStringHandle(cause)
-	defer causePtr.Free()
+	defer c.FreeHandle(causePtr.Raw())
 
 	return c.Call("QJS_ThrowRangeError", c.Raw(), causePtr.Raw())
 }
@@ -342,7 +343,7 @@ func (c *Context) ThrowInternalError(format string, args ...any) *Value {
 	cause := fmt.Sprintf(format, args...)
 
 	causePtr := c.NewStringHandle(cause)
-	defer causePtr.Free()
+	defer c.FreeHandle(causePtr.Raw())
 
 	return c.Call("QJS_ThrowInternalError", c.Raw(), causePtr.Raw())
 }

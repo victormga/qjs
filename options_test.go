@@ -1,6 +1,7 @@
 package qjs_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -100,6 +101,21 @@ func TestEvalOptions(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, int32(579), val.Int32())
 		val.Free()
+	})
+
+	t.Run("BytecodeRoundTripRepeated", func(t *testing.T) {
+		runtime := must(qjs.New())
+		defer runtime.Close()
+
+		for i := range 50 {
+			bytecode, err := runtime.Compile("test.js", qjs.Code(fmt.Sprintf("'v' + %d", i)))
+			require.NoError(t, err)
+
+			val, err := runtime.Eval("test.js", qjs.Bytecode(bytecode))
+			require.NoError(t, err)
+			assert.Equal(t, fmt.Sprintf("v%d", i), val.String())
+			val.Free()
+		}
 	})
 
 	t.Run("ModuleBytecodeCompileAndEval", func(t *testing.T) {

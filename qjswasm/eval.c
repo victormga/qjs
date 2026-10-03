@@ -368,11 +368,9 @@ unsigned char *QJS_Compile(JSContext *c, QJSEvalOptions opts, size_t *outSize)
 }
 
 /**
- * Compiles code (as a module or global script) to bytecode and returns a packed uint64_t value
- * containing both the bytecode's memory address (high 32 bits) and length (low 32 bits).
+ * Compiles code (as a module or global script) to bytecode, returned as a pack_copy block.
  *
  * Returns NULL on error.
- * NOTE: The caller must free both the returned uint64_t pointer and the bytecode memory it points to.
  */
 uint64_t *QJS_Compile2(JSContext *ctx, QJSEvalOptions opts)
 {
@@ -383,15 +381,8 @@ uint64_t *QJS_Compile2(JSContext *ctx, QJSEvalOptions opts)
         return NULL;
     }
 
-    uint64_t *result = malloc(sizeof(uint64_t));
-    if (!result)
-    {
-        free(bytecode);
-        return NULL; // Allocation failure
-    }
-
-    // Store the address of the bytecode in the high 32 bits and the length in the low 32 bits
-    *result = ((uint64_t)(uintptr_t)bytecode << 32) | (uint32_t)bytecode_len;
+    uint64_t *result = pack_copy(bytecode, bytecode_len, bytecode_len);
+    free(bytecode);
     return result;
 }
 

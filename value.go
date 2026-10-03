@@ -231,11 +231,10 @@ func (v *Value) GetOwnPropertyNames() (_ []string, err error) {
 }
 
 func (v *Value) GetOwnProperties() []OwnProperty {
-	ptr, entriesCount := v.context.CallUnPack(
-		"QJS_GetOwnPropertyNames",
-		v.Ctx(),
-		v.Raw(),
-	)
+	packed := v.Call("QJS_GetOwnPropertyNames", v.Ctx(), v.Raw())
+	defer packed.handle.Free()
+
+	ptr, entriesCount := v.context.runtime.mem.UnpackPtr(packed.Raw())
 	if entriesCount == 0 {
 		return []OwnProperty{}
 	}
@@ -249,7 +248,7 @@ func (v *Value) GetOwnProperties() []OwnProperty {
 	// This is safe because:
 	// 1. Memory size is validated (size * jsPropertyEnumSize)
 	// 2. JSPropertyEnum layout matches C struct layout
-	// 3. Memory lifetime is managed by context.FreeHandle()
+	// 3. The packed block is freed only after the entries are copied out
 	entries := unsafe.Slice((*JSPropertyEnum)(unsafe.Pointer(&bytes[0])), entriesCount)
 
 	property := make([]OwnProperty, len(entries))
@@ -264,8 +263,6 @@ func (v *Value) GetOwnProperties() []OwnProperty {
 			)),
 		}
 	}
-
-	v.context.FreeHandle(uint64(ptr))
 
 	return property
 }
@@ -293,6 +290,7 @@ func (v *Value) GetPropertyStr(name string) *Value {
 func (v *Value) SetPropertyStr(name string, val *Value) {
 	if val != nil {
 		nameVal := v.context.NewStringHandle(name)
+		defer v.context.FreeHandle(nameVal.Raw())
 		v.Call("JS_SetPropertyStr", v.Ctx(), v.Raw(), nameVal.Raw(), val.Raw())
 	}
 }
@@ -381,10 +379,8 @@ func (v *Value) ByteLen() int64 {
 
 // ToByteArray returns the byte array of the ArrayBuffer.
 func (v *Value) ToByteArray() []byte {
-	v2 := v.Clone()
-
-	result := v2.context.Call("QJS_GetArrayBuffer", v2.context.Raw(), v2.Raw())
-	defer result.Free()
+	result := v.context.Call("QJS_GetArrayBuffer", v.context.Raw(), v.Raw())
+	defer result.handle.Free()
 
 	return result.handle.Bytes()
 }

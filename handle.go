@@ -31,6 +31,7 @@ func NewHandle(runtime *Runtime, ptr uint64) *Handle {
 
 // Free releases the memory associated with this handle.
 // Only used with C values such as: QJS_ToCString, QJS_JSONStringify.
+// For those packed results it releases the packed pointer and its data in one go.
 // Do not use this method for JsValue.
 func (h *Handle) Free() {
 	if h == nil || h.runtime == nil {
@@ -199,6 +200,7 @@ func (h *Handle) String() string {
 // Bytes converts the handle value to []byte by reading from QuickJS memory.
 // Returns empty slice for zero handles or if the handle is freed.
 // The returned bytes are a copy and safe to modify.
+// The data lives inside the packed block, which only Free releases.
 func (h *Handle) Bytes() []byte {
 	if h == nil || h.IsFreed() || h.raw == 0 {
 		return nil
@@ -208,9 +210,6 @@ func (h *Handle) Bytes() []byte {
 	if addr == 0 || size == 0 {
 		return nil
 	}
-
-	// Ensure we free the address after reading
-	defer h.runtime.FreeHandle(uint64(addr))
 
 	// Read from WebAssembly memory
 	data := h.runtime.mem.MustRead(addr, uint64(size))

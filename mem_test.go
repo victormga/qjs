@@ -3,6 +3,7 @@ package qjs_test
 import (
 	"fmt"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/fastschema/qjs"
@@ -793,6 +794,58 @@ func TestMem_EdgeCases(t *testing.T) {
 	for _, tc := range edgeCases {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.testFunc(t, util)
+		})
+	}
+}
+
+func TestMem_RepeatedCallsDoNotGrowMemory(t *testing.T) {
+	bigString := strings.Repeat("x", 64<<10)
+
+	tests := []struct {
+		name       string
+		iterations int
+		call       func(rt *qjs.Runtime)
+	}{
+		{
+			name:       "Value.String",
+			iterations: 100_000,
+			call: func(rt *qjs.Runtime) {
+				num := rt.Context().NewFloat64(1234567.891)
+				_ = num.String()
+				num.Free()
+			},
+		},
+		{
+			name:       "Eval",
+			iterations: 300,
+			call: func(rt *qjs.Runtime) {
+				must(rt.Eval("big.js", qjs.Code("// "+bigString+"\n1"))).Free()
+			},
+		},
+		{
+			name:       "NewString",
+			iterations: 300,
+			call: func(rt *qjs.Runtime) {
+				rt.Context().NewString(bigString).Free()
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			rt := must(qjs.New())
+			defer rt.Close()
+
+			for range tc.iterations / 10 {
+				tc.call(rt)
+			}
+			before := rt.Mem().Size()
+
+			for range tc.iterations {
+				tc.call(rt)
+			}
+
+			assert.Less(t, rt.Mem().Size()-before, uint32(1<<20), "wasm memory grew by %d bytes", rt.Mem().Size()-before)
 		})
 	}
 }

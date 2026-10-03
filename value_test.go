@@ -1,7 +1,9 @@
 package qjs_test
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"math/big"
 	"slices"
 	"testing"
@@ -550,6 +552,28 @@ func TestValuePropertyOperations(t *testing.T) {
 		assert.True(t, found["b"])
 	})
 
+	t.Run("GetOwnPropertyNamesRepeated", func(t *testing.T) {
+		rt := must(qjs.New())
+		defer rt.Close()
+
+		// Up to 100 keys so the engine's property table spans small and large allocations.
+		for i := range 100 {
+			code := fmt.Sprintf("Object.fromEntries(Array.from({ length: %d }, (_, k) => ['k' + k, k]))", i+1)
+			obj := must(rt.Eval("props.js", qjs.Code(code)))
+
+			// Freed memory keeps its bytes, so the table lands on non-zero garbage, which a wrong free() trips over.
+			must(rt.Eval("junk.js", qjs.Code("void 'z'.repeat(1 << 16); gc()"))).Free()
+
+			for range 2 {
+				names, err := obj.GetOwnPropertyNames()
+				require.NoError(t, err)
+				require.Len(t, names, i+1)
+				assert.Equal(t, fmt.Sprintf("k%d", i), names[i])
+			}
+			obj.Free()
+		}
+	})
+
 	t.Run("ForEach", func(t *testing.T) {
 		nonObject := ctx.NewInt32(42)
 		defer nonObject.Free()
@@ -699,6 +723,30 @@ func TestValueArrayBufferOperations(t *testing.T) {
 
 		bytes := buffer.ToByteArray()
 		assert.Equal(t, []byte{10, 20, 30, 40}, bytes)
+	})
+
+	t.Run("ToByteArrayRepeatedReads", func(t *testing.T) {
+		rt := must(qjs.New())
+		defer rt.Close()
+
+		small := must(rt.Eval("small.js", qjs.Code("new Uint8Array([1, 2, 3, 4]).buffer")))
+		defer small.Free()
+
+		for i := range 20 {
+			require.Equal(t, []byte{1, 2, 3, 4}, small.ToByteArray())
+
+			// Freed memory keeps its bytes, so new buffers land on non-zero garbage, which a wrong free() trips over.
+			code := fmt.Sprintf("void 'z'.repeat(1 << 16); gc(); Array.from({ length: 64 }, () => new Uint8Array(200).fill(%d).buffer)", i)
+			fresh := must(rt.Eval("fresh.js", qjs.Code(code)))
+			want := bytes.Repeat([]byte{byte(i)}, 200)
+			for k := range int64(64) {
+				buf := fresh.GetPropertyIndex(k)
+				require.Equal(t, want, buf.ToByteArray())
+				require.Equal(t, want, buf.ToByteArray())
+				buf.Free()
+			}
+			fresh.Free()
+		}
 	})
 
 	t.Run("Len", func(t *testing.T) {

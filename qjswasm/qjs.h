@@ -61,6 +61,7 @@ char *append_suffix(const char *base, const char *suffix);
 bool input_is_file(QJSEvalOptions opts);
 void js_set_global_objs(JSContext *ctx);
 char *detect_entry_point(char *module_name);
+uint64_t *pack_copy(const void *data, size_t size, uint32_t len);
 JSValue js_std_await(JSContext *ctx, JSValue obj);
 void QJS_Free(QJSRuntime *qjs);
 void QJS_FreeValue(JSContext *ctx, JSValue val);
