@@ -189,7 +189,12 @@ func (r *Runtime) Close() {
 
 	// Free QJS runtime handle
 	if r.handle != nil {
-		r.FreeQJSRuntime()
+		// Panics once a cancelled context has closed the module, and what follows must still run, or
+		// the registry keeps the whole runtime alive.
+		func() {
+			defer func() { _ = recover() }()
+			r.FreeQJSRuntime()
+		}()
 		r.handle = nil
 	}
 
