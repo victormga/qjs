@@ -176,6 +176,37 @@ func TestRuntime(t *testing.T) {
 		}, "Closing nil runtime should not panic")
 	})
 
+	t.Run("UnboundedRecursionThrowsRangeError", func(t *testing.T) {
+		tests := []struct {
+			name string
+			code string
+		}{
+			{name: "plain", code: "function f() { return f() } f()"},
+			// The C JSON serializer spends little C stack per level, so wazero's native stack limit gives out first.
+			{name: "toJSON", code: "const o = { toJSON() { return { a: o } } }; JSON.stringify(o)"},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				rt := must(qjs.New(qjs.Option{MaxStackSize: 1 << 20}))
+
+				var err error
+				require.NotPanics(t, func() {
+					_, err = rt.Eval("recursion.js", qjs.Code(tc.code))
+				}, "a wasm stack (C stack or wazero's native stack) ran out before QuickJS's MaxStackSize check")
+				// A trapped instance can trap again in Close.
+				defer rt.Close()
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), "RangeError")
+
+				val, err := rt.Eval("after.js", qjs.Code("1 + 1"))
+				require.NoError(t, err)
+				defer val.Free()
+				assert.Equal(t, int32(2), val.Int32())
+			})
+		}
+	})
+
 	t.Run("CallNonExistentFunction", func(t *testing.T) {
 		rt, _ := setupTestContext(t)
 		assert.Panics(t, func() {

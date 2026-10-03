@@ -50,7 +50,8 @@ set_target_properties(qjswasm PROPERTIES
     OUTPUT_NAME "qjswasm"
 )
 
-target_link_options(qjswasm PRIVATE 
+target_link_options(qjswasm PRIVATE
+    "LINKER:-z,stack-size=2097152" # must exceed MaxStackSize (QuickJS default 1 MiB) or deep recursion traps instead of throwing RangeError
     "LINKER:--export=js_std_await"
     "LINKER:--export=New_QJS"
     "LINKER:--export=New_QJSContext"
@@ -181,4 +182,3 @@ add_compile_options(-O3 -DNDEBUG)
 add_link_options(-O3)
 
 add_link_options("LINKER:--stack-first")
-add_link_options("LINKER:--initial-memory=1310720") # 20 pages
