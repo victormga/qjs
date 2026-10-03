@@ -1,3 +1,5 @@
 coverage
 .tool-versions
 releases
+dist
+.vscode
