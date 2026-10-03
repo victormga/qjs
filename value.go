@@ -388,6 +388,11 @@ func (v *Value) ToByteArray() []byte {
 func (v *Value) Exception() error {
 	cause := v.String()
 
+	// Reading a property of a thrown null or undefined throws a TypeError of its own.
+	if v.IsNull() || v.IsUndefined() {
+		return errors.New(cause)
+	}
+
 	stack := v.GetPropertyStr("stack")
 	defer stack.Free()
 

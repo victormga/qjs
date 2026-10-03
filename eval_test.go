@@ -27,6 +27,9 @@ func testGlobalModeEvaluation(t *testing.T) {
 			{name: "expression_result", file: "global_has_result.js", code: "55555", expectValue: func(t *testing.T, val *qjs.Value, err error) { assert.Equal(t, int32(55555), val.Int32()) }},
 			{name: "syntax_error", file: "syntax_error.js", code: "const a = (", expectErr: func(t *testing.T, err error) { assert.Error(t, err); assert.Contains(t, err.Error(), "SyntaxError") }},
 			{name: "runtime_error", file: "throw_error.js", code: "throw new Error('test error')", expectErr: func(t *testing.T, err error) { assert.Error(t, err); assert.Contains(t, err.Error(), "test error") }},
+			{name: "thrown_null", file: "throw_null.js", code: "throw null", expectErr: func(t *testing.T, err error) { assert.EqualError(t, err, "null") }},
+			{name: "thrown_undefined", file: "throw_undefined.js", code: "throw undefined", expectErr: func(t *testing.T, err error) { assert.EqualError(t, err, "undefined") }},
+			{name: "rejected_with_null", file: "reject_null.js", code: "await Promise.reject(null)", options: []qjs.EvalOptionFunc{qjs.FlagAsync()}, expectErr: func(t *testing.T, err error) { assert.EqualError(t, err, "null") }},
 		}
 		runEvalTests(t, tests, "")
 	})
