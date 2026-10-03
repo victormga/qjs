@@ -38,6 +38,7 @@ func testGlobalModeEvaluation(t *testing.T) {
 		tests := []evalTest{
 			{name: "top_level_await_error_without_flag", file: "global_top_level_await_error.js", code: "await Promise.resolve(42)", expectErr: func(t *testing.T, err error) { assert.Error(t, err); assert.Contains(t, err.Error(), "SyntaxError") }},
 			{name: "top_level_await_works_with_flag", file: "global_top_level_await_works.js", code: "await Promise.resolve(42)", options: []qjs.EvalOptionFunc{qjs.FlagAsync()}, expectValue: func(t *testing.T, val *qjs.Value, err error) { assert.Equal(t, int32(42), val.Int32()) }},
+			{name: "throw_survives_pending_jobs", file: "global_throw_survives_pending_jobs.js", code: "(async () => { try { await Promise.reject(1) } catch {} })(); throw new Error('boom')", options: []qjs.EvalOptionFunc{qjs.FlagAsync()}, expectErr: func(t *testing.T, err error) { assert.ErrorContains(t, err, "boom") }},
 		}
 		runEvalTests(t, tests, "")
 	})

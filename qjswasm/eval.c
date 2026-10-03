@@ -303,6 +303,9 @@ JSValue QJS_Eval(JSContext *ctx, QJSEvalOptions opts)
     if (JS_IsPromise(result))
         result = js_std_await(ctx, result);
 
+    if (JS_IsException(result))
+        return JS_Throw(ctx, JS_GetException(ctx));
+
     js_std_loop(ctx);
     if (JS_HasException(ctx))
         return JS_Throw(ctx, JS_GetException(ctx));
