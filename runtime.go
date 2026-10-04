@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"runtime/debug"
 	"sync"
+	"time"
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	wsp1 "github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
+	"github.com/tetratelabs/wazero/sys"
 )
 
 //go:embed qjs.wasm
@@ -142,7 +144,7 @@ func New(options ...Option) (runtime *Runtime, err error) {
 			WithStartFunctions(option.StartFunctionName).
 			WithSysWalltime().
 			WithSysNanotime().
-			WithSysNanosleep().
+			WithNanosleep(nanosleep(option)).
 			WithFSConfig(fsConfig).
 			WithStdout(option.Stdout).
 			WithStderr(option.Stderr),
@@ -153,6 +155,23 @@ func New(options ...Option) (runtime *Runtime, err error) {
 	runtime.initializeRuntime()
 
 	return runtime, nil
+}
+
+// A module asleep in a host call is not running, so CloseOnContextDone alone waits the sleep out.
+func nanosleep(option Option) sys.Nanosleep {
+	var done <-chan struct{} // nil blocks forever: without CloseOnContextDone the context does not end the module
+	if option.CloseOnContextDone {
+		done = option.Context.Done()
+	}
+
+	return func(ns int64) {
+		timer := time.NewTimer(time.Duration(ns))
+		defer timer.Stop()
+		select {
+		case <-timer.C:
+		case <-done:
+		}
+	}
 }
 
 func (r *Runtime) Raw() uint64 {
